@@ -2,9 +2,8 @@
 
 const elliptic = require('elliptic');
 const secp256k1 = elliptic.ec('secp256k1');
-const hashjs = require('hash.js');
 const {KeyPair, KeyType} = require('./keypair');
-const {Sha512, cached} = require('./utils');
+const {Sha512, cached, parseBytes, parsePublicKey} = require('./utils');
 
 function deriveScalar(bytes, discrim) {
   const order = secp256k1.curve.n;
@@ -34,7 +33,7 @@ function deriveScalar(bytes, discrim) {
 * @return {bn.js} - 256 bit scalar value
 *
 */
-function deriveSecret(seed, opts={}) {
+function derivePrivate(seed, opts={}) {
   const root = opts.validator;
   const order = secp256k1.curve.n;
 
@@ -68,6 +67,18 @@ class K256Pair extends KeyPair {
     this.validator = options.validator;
   }
 
+  /**
+  * @param {String|Array} publicKey - public key in canonical form
+  * @return {K256Pair} key pair
+  */
+  static fromPublic(publicKey) {
+    return new K256Pair({publicBytes: parsePublicKey(publicKey)});
+  }
+
+  static fromPrivate(privateKey) {
+    return new K256Pair({privateBytes: parseBytes(privateKey)});
+  }
+
   static fromSeed(seedBytes, opts={}) {
     return new K256Pair({seedBytes, validator: opts.validator});
   }
@@ -80,10 +91,10 @@ class K256Pair extends KeyPair {
   }
 
   /*
-  @param {Array<Byte>} message - bytes
   @param {Array<Byte>} signature - DER encoded signature bytes
+  @param {Array<Byte>} message - bytes
    */
-  verify(message, signature) {
+  verify(signature, message) {
     try {
       return this.key().verify(this.hashMessage(message), signature);
       /* eslint-disable no-catch-shadow */
@@ -94,7 +105,7 @@ class K256Pair extends KeyPair {
   }
 
   @cached
-  pubKeyCanonicalBytes() {
+  publicBytes() {
     return this.key().getPublic().encodeCompressed();
   }
 
@@ -107,16 +118,26 @@ class K256Pair extends KeyPair {
   @return {Array<Byte>} - 256 bit hash of the message
    */
   hashMessage(message) {
-    return hashjs.sha512().update(message).digest().slice(0, 32);
+    return new Sha512().add(message).first256();
+  }
+
+  @cached
+  privateBytes() {
+    return this._private().toArray('be', 32);
+  }
+
+  _private() {
+    // elliptic will happily parse bytes or a bn.js object
+    return this._privateBytes ||
+           derivePrivate(this._seedBytes, {validator: this.validator});
   }
 
   @cached
   key() {
-    if (this.seedBytes) {
-      const options = {validator: this.validator};
-      return secp256k1.keyFromPrivate(deriveSecret(this.seedBytes, options));
+    if (this.hasPrivateKey()) {
+      return secp256k1.keyFromPrivate(this._private());
     }
-    return secp256k1.keyFromPublic(this.pubKeyCanonicalBytes());
+    return secp256k1.keyFromPublic(this.publicBytes());
   }
 
 }

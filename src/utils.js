@@ -1,6 +1,8 @@
 'use strict';
 
+const {decodeSeed, decodeNodePublic} = require('ripple-address-codec');
 const hashjs = require('hash.js');
+const {utils: {parseBytes}} = require('elliptic');
 const Sha512 = require('./sha512');
 
 function isVirtual(_, __, descriptor) {
@@ -36,8 +38,8 @@ function bytesToHex(a) {
   }).join('');
 }
 
-function createAccountID(pubKeyBytes) {
-  const hash256 = hashjs.sha256().update(pubKeyBytes).digest();
+function deriveAccountIDBytes(publicBytes) {
+  const hash256 = hashjs.sha256().update(publicBytes).digest();
   const hash160 = hashjs.ripemd160().update(hash256).digest();
   return hash160;
 }
@@ -46,12 +48,39 @@ function seedFromPhrase(phrase) {
   return hashjs.sha512().update(phrase).digest().slice(0, 16);
 }
 
+function parsePublicKey(publicKey) {
+  if (typeof publicKey === 'string' && publicKey[0] === 'n') {
+    return decodeNodePublic(publicKey);
+  }
+  return parseBytes(publicKey);
+}
+
+function parseSeed(seed, type='secp256k1') {
+  if (typeof seed !== 'string') {
+    return {bytes: seed, type};
+  }
+  return decodeSeed(seed);
+}
+
+function parseKey(key) {
+  // parsePublicKey will parse any validator base58 if the key is a string and
+  // the key starts with "n"
+  const bytes = parsePublicKey(key);
+  return {type: bytes.length === 33 &&
+                bytes[0] === 0xED ? 'ed25519' : 'secp256k1',
+          bytes};
+}
+
 module.exports = {
   cached,
   bytesToHex,
-  createAccountID,
+  deriveAccountIDBytes,
   isVirtual,
   seedFromPhrase,
   Sha512,
-  toGenericArray
+  toGenericArray,
+  parseBytes,
+  parsePublicKey,
+  parseSeed,
+  parseKey
 };

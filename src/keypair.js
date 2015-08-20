@@ -5,7 +5,7 @@ const {
   bytesToHex,
   cached,
   isVirtual,
-  createAccountID
+  deriveAccountIDBytes
 } = require('./utils');
 
 const KeyType = {
@@ -14,9 +14,10 @@ const KeyType = {
 };
 
 class KeyPair {
-  constructor({seedBytes, pubBytes}) {
-    this.seedBytes = seedBytes;
-    this._pubKeyCanonicalBytes = pubBytes;
+  constructor({seedBytes, publicBytes, privateBytes}) {
+    this._seedBytes = seedBytes;
+    this._publicBytes = publicBytes;
+    this._privateBytes = privateBytes;
   }
 
   /*
@@ -26,8 +27,8 @@ class KeyPair {
   sign() {}
 
   /*
-  * @param {Array<Byte>} message
   * @param {Array<Byte>} signature
+  * @param {Array<Byte>} message
   */
   @isVirtual
   verify() {}
@@ -36,30 +37,75 @@ class KeyPair {
   * @return {Array<Byte>} of bytes, in canonical form, for signing
   */
   @isVirtual
-  pubKeyCanonicalBytes() {}
+  publicBytes() {}
+
+  /*
+  * @return {Array<Byte>} of bytes, in canonical form, with leading key type
+  *                       discriminator bytes
+  */
+  @isVirtual
+  privateBytes() {}
 
   @cached
-  pubKeyHex() {
-    return bytesToHex(this.pubKeyCanonicalBytes());
+  publicHex() {
+    return bytesToHex(this.publicBytes());
   }
 
   @cached
-  accountBytes() {
-    return createAccountID(this.pubKeyCanonicalBytes());
+  privateHex() {
+    return bytesToHex(this.privateBytes());
   }
 
   @cached
-  accountID() {
-    return codec.encodeAccountID(this.accountBytes());
+  idBytes() {
+    return deriveAccountIDBytes(this.publicBytes());
+  }
+
+  hasPrivateKey() {
+    return this._privateBytes || this._seedBytes;
+  }
+
+  /**
+  * The canonical keypair
+  */
+  @cached
+  id() {
+    return codec.encodeAccountID(this.idBytes());
   }
 
   @cached
   seed() {
-    return codec.encodeSeed(this.seedBytes, this.type);
+    // seed entropy used to create the pair, if specified
+    return codec.encodeSeed(this._seedBytes, this.type);
+  }
+
+  @cached
+  privateKeyHex() {
+    return bytesToHex(this.privateBytes());
   }
 
   signHex(message) {
     return bytesToHex(this.sign(message));
+  }
+
+  toJSON() {
+    const json = {
+      publicKey: this.validator ?
+              codec.encodeNodePublic(this.publicBytes()) :
+              this.publicHex()
+    };
+    const hasSeed = this._seedBytes;
+    const hasPrivate = hasSeed || this._privateBytes;
+    if (hasSeed) {
+      json.seed = this.seed();
+    }
+    if (hasPrivate) {
+      json.privateKey = this.privateHex();
+    }
+    if (!this.validator) {
+      json.id = this.id();
+    }
+    return json;
   }
 }
 

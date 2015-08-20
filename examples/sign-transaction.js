@@ -16,7 +16,7 @@ function signTxJson(seed, json) {
   var tx = Transaction.from_json(json);
   var tx_json = tx.tx_json;
 
-  tx_json.SigningPubKey = keyPair.pubKeyHex();
+  tx_json.SigningPubKey = keyPair.publicHex();
   tx_json.TxnSignature = keyPair.signHex(signingData(tx));
 
   var serialized = tx.serialize();

@@ -4,37 +4,37 @@ An implementation of ripple keypairs & wallet generation using
 [elliptic](https://github.com/indutny/elliptic) which supports rfc6979 and
 eddsa deterministic signatures.
 
-## Generate a random wallet
+## Generate a random account keys
 ```js
-> var generateWallet = require('ripple-keypairs').generateWallet;
-> generateWallet({type: 'ed25519'});
-{ seed: 'sEd7t79mzn2dwy3vvpvRmaaLbLhvme6',
-  accountID: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
-  publicKey: 'ED5F5AC8B98974A3CA843326D9B88CEBD0560177B973EE0B149F782CFAA06DC66A' }
+> require('ripple-keypairs').generateAccountKeys()
+{ seed: 'sh9g1aeTESY5W4ZvNmHDKJCurrCqJ',
+  privateKey: '122063625AC32AEF0479EF4B50FEFEF9F8649F041F057BE867EEAEDF4706AB18',
+  publicKey: '034C48914136FCF21CB5B25C2227ADD08D622A5E74ACCEC456E2E51241DA7E165B',
+  id: 'rLd8vAKQXYCyZajqXHY5LzR7fLEoTGno5k' }
 ```
 
-## Derive a wallet from a seed
+## Derive account keys from a seed
 ```js
-> var walletFromSeed = require('ripple-keypairs').walletFromSeed;
-> walletFromSeed('sEd7t79mzn2dwy3vvpvRmaaLbLhvme6');
+> require('ripple-keypairs').accountKeysFromSeed('sEd7t79mzn2dwy3vvpvRmaaLbLhvme6');
 { seed: 'sEd7t79mzn2dwy3vvpvRmaaLbLhvme6',
-  accountID: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
-  publicKey: 'ED5F5AC8B98974A3CA843326D9B88CEBD0560177B973EE0B149F782CFAA06DC66A' }')
+  privateKey: 'EDFB674022E0CEFF69F9C6193C2D59DD0CA7B164AD323C8376AFF04AC37463E3DB',
+  publicKey: 'ED5F5AC8B98974A3CA843326D9B88CEBD0560177B973EE0B149F782CFAA06DC66A',
+  id: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ' }
 ```
 
 ## Generate random validator keys
 ```js
-> var generateValidatorKeys = require('ripple-keypairs').generateValidatorKeys;
-> generateValidatorKeys();
+> require('ripple-keypairs').generateValidatorKeys();
 { seed: 'ssC7Y9LMKhuzFMVueaj2fnTuGLftA',
+  privateKey: 'BE011EF4B7A38D42C09DD299EFD0048DC9986F44076778F19AAC25E321D46247',
   publicKey: 'n9MU2RsULUayZnWeLssjbMzVRPeVUUMgiPYTwe8eMgpdGDWp5t8C' }
 ```
 
 ## Derive validator keys from a seed
 ```js
-> var validatorKeysFromSeed = require('ripple-keypairs').validatorKeysFromSeed;
-> validatorKeysFromSeed('ssC7Y9LMKhuzFMVueaj2fnTuGLftA');
+> require('ripple-keypairs').validatorKeysFromSeed('ssC7Y9LMKhuzFMVueaj2fnTuGLftA');
 { seed: 'ssC7Y9LMKhuzFMVueaj2fnTuGLftA',
+  privateKey: 'BE011EF4B7A38D42C09DD299EFD0048DC9986F44076778F19AAC25E321D46247',
   publicKey: 'n9MU2RsULUayZnWeLssjbMzVRPeVUUMgiPYTwe8eMgpdGDWp5t8C' }
 ```
 
