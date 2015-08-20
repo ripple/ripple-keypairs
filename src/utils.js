@@ -1,26 +1,42 @@
 'use strict';
 
+const util = require('util');
 const {decodeSeed, decodeNodePublic} = require('ripple-address-codec');
 const hashjs = require('hash.js');
 const {utils: {parseBytes}} = require('elliptic');
 const Sha512 = require('./sha512');
 
-function isVirtual(_, __, descriptor) {
-  descriptor.value = function() {
-    throw new Error('virtual method not implemented ');
-  };
-}
-
-function cached(_, name, descriptor) {
-  const computer = descriptor.value;
-  const key = '_' + name;
-  descriptor.value = function() {
-    let value = this[key];
-    if (value === undefined) {
-      value = this[key] = computer.call(this);
-    }
-    return value;
-  };
+function extendClass(klass, definition) {
+  if (definition.extends) {
+    util.inherits(klass, definition.extends);
+  }
+  const proto = klass.prototype;
+  const allMethods = klass._allMethods = [];
+  function addFunc(original, wrapper) {
+    proto[original.name] = wrapper;
+    allMethods.push(original.name);
+  }
+  (definition.virtuals || []).forEach(f => {
+    addFunc(f, function() {
+      throw new Error('unimplemented');
+    });
+  });
+  (definition.methods || []).forEach(f => {
+    addFunc(f, f);
+  });
+  (definition.statics || []).forEach(f => {
+    klass[f.name] = f;
+  });
+  (definition.cached || []).forEach(f => {
+    const key = '_' + f.name;
+    addFunc(f, function() {
+      let value = this[key];
+      if (value === undefined) {
+        value = this[key] = f.call(this);
+      }
+      return value;
+    });
+  });
 }
 
 function toGenericArray(sequence) {
@@ -72,10 +88,9 @@ function parseKey(key) {
 }
 
 module.exports = {
-  cached,
   bytesToHex,
   deriveAccountIDBytes,
-  isVirtual,
+  extendClass,
   seedFromPhrase,
   Sha512,
   toGenericArray,

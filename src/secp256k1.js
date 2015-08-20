@@ -3,7 +3,7 @@
 const elliptic = require('elliptic');
 const secp256k1 = elliptic.ec('secp256k1');
 const {KeyPair, KeyType} = require('./keypair');
-const {Sha512, cached, parseBytes, parsePublicKey} = require('./utils');
+const {Sha512, extendClass, parseBytes, parsePublicKey} = require('./utils');
 
 function deriveScalar(bytes, discrim) {
   const order = secp256k1.curve.n;
@@ -60,87 +60,88 @@ function accountPublicFromPublicGenerator(publicGenBytes) {
   return offset.encodeCompressed();
 }
 
-class K256Pair extends KeyPair {
-  constructor(options) {
-    super(options);
-    this.type = KeyType.secp256k1;
-    this.validator = options.validator;
-  }
-
-  /**
-  * @param {String|Array} publicKey - public key in canonical form
-  * @return {K256Pair} key pair
-  */
-  static fromPublic(publicKey) {
-    return new K256Pair({publicBytes: parsePublicKey(publicKey)});
-  }
-
-  static fromPrivate(privateKey) {
-    return new K256Pair({privateBytes: parseBytes(privateKey)});
-  }
-
-  static fromSeed(seedBytes, opts={}) {
-    return new K256Pair({seedBytes, validator: opts.validator});
-  }
-
-  /*
-  @param {Array<Byte>} message (bytes)
-   */
-  sign(message) {
-    return this._createSignature(message).toDER();
-  }
-
-  /*
-  @param {Array<Byte>} signature - DER encoded signature bytes
-  @param {Array<Byte>} message - bytes
-   */
-  verify(signature, message) {
-    try {
-      return this.key().verify(this.hashMessage(message), signature);
-      /* eslint-disable no-catch-shadow */
-    } catch (e) {
-      /* eslint-enable no-catch-shadow */
-      return false;
-    }
-  }
-
-  @cached
-  publicBytes() {
-    return this.key().getPublic().encodeCompressed();
-  }
-
-  _createSignature(message) {
-    return this.key().sign(this.hashMessage(message), {canonical: true});
-  }
-
-  /*
-  @param {Array<Byte>} message - (bytes)
-  @return {Array<Byte>} - 256 bit hash of the message
-   */
-  hashMessage(message) {
-    return new Sha512().add(message).first256();
-  }
-
-  @cached
-  privateBytes() {
-    return this._private().toArray('be', 32);
-  }
-
-  _private() {
-    // elliptic will happily parse bytes or a bn.js object
-    return this._privateBytes ||
-           derivePrivate(this._seedBytes, {validator: this.validator});
-  }
-
-  @cached
-  key() {
-    if (this.hasPrivateKey()) {
-      return secp256k1.keyFromPrivate(this._private());
-    }
-    return secp256k1.keyFromPublic(this.publicBytes());
-  }
-
+function K256Pair(options) {
+  KeyPair.call(this, options);
+  this.type = KeyType.secp256k1;
+  this.validator = options.validator;
 }
+
+extendClass(K256Pair, {
+  extends: KeyPair,
+  statics: [
+    /**
+    * @param {String|Array} publicKey - public key in canonical form
+    * @return {K256Pair} key pair
+    */
+    function fromPublic(publicKey) {
+      return new K256Pair({publicBytes: parsePublicKey(publicKey)});
+    },
+
+    function fromPrivate(privateKey) {
+      return new K256Pair({privateBytes: parseBytes(privateKey)});
+    },
+
+    function fromSeed(seedBytes, opts={}) {
+      return new K256Pair({seedBytes, validator: opts.validator});
+    }
+  ],
+  methods: [
+    /*
+    @param {Array<Byte>} message (bytes)
+     */
+    function sign(message) {
+      return this._createSignature(message).toDER();
+    },
+
+    /*
+    @param {Array<Byte>} signature - DER encoded signature bytes
+    @param {Array<Byte>} message - bytes
+     */
+    function verify(signature, message) {
+      try {
+        return this.key().verify(this.hashMessage(message), signature);
+        /* eslint-disable no-catch-shadow */
+      } catch (e) {
+        /* eslint-enable no-catch-shadow */
+        return false;
+      }
+    },
+
+    function _createSignature(message) {
+      return this.key().sign(this.hashMessage(message), {canonical: true});
+    },
+
+    function _private() {
+      // elliptic will happily parse bytes or a bn.js object
+      return this._privateBytes ||
+             derivePrivate(this._seedBytes, {validator: this.validator});
+    },
+
+    /*
+    @param {Array<Byte>} message - (bytes)
+    @return {Array<Byte>} - 256 bit hash of the message
+     */
+    function hashMessage(message) {
+      return new Sha512().add(message).first256();
+    }
+  ],
+  cached: [
+    function publicBytes() {
+      return this.key().getPublic().encodeCompressed();
+    },
+
+    function privateBytes() {
+      return this._private().toArray('be', 32);
+    },
+
+    function key() {
+      if (this.hasPrivateKey()) {
+        return secp256k1.keyFromPrivate(this._private());
+      }
+      return secp256k1.keyFromPublic(this.publicBytes());
+    }
+  ]
+});
 
 module.exports = {
   K256Pair,
