@@ -24,7 +24,7 @@ function pairContructor(type) {
   return type === 'ed25519' ? Ed25519Pair : K256Pair;
 }
 
-function keyPairFromSeed(seed, type=KeyType.secp256k1, options) {
+function keyPairFromSeed(seed, type = KeyType.secp256k1, options) {
   if (typeof seed === 'string') {
     const decoded = decodeSeed(seed);
     const optionsArg = type;
@@ -52,7 +52,7 @@ function deriveValidatorKeys(seedBytes) {
   return K256Pair.fromSeed(seedBytes, {validator: true}).toJSON();
 }
 
-function generateAccountKeys(opts={}) {
+function generateAccountKeys(opts = {}) {
   const seedBytes = opts.entropy || brorand(16);
   return deriveAccountKeys(seedBytes, opts.type);
 }
@@ -66,7 +66,7 @@ function accountKeysFromPhrase(phrase, seedType) {
   return deriveAccountKeys(seedFromPhrase(phrase), seedType);
 }
 
-function generateValidatorKeys(opts={}) {
+function generateValidatorKeys(opts = {}) {
   return deriveValidatorKeys(opts.entropy || brorand(16));
 }
 

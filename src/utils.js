@@ -71,7 +71,7 @@ function parsePublicKey(publicKey) {
   return parseBytes(publicKey);
 }
 
-function parseSeed(seed, type='secp256k1') {
+function parseSeed(seed, type = 'secp256k1') {
   if (typeof seed !== 'string') {
     return {bytes: seed, type};
   }

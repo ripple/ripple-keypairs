@@ -3,7 +3,8 @@
 const elliptic = require('elliptic');
 const secp256k1 = elliptic.ec('secp256k1');
 const {KeyPair, KeyType} = require('./keypair');
-const {Sha512, extendClass, parseBytes, parsePublicKey} = require('./utils');
+const utils = require('./utils');
+const {Sha512, extendClass, toGenericArray, parseBytes, parsePublicKey} = utils;
 
 function deriveScalar(bytes, discrim) {
   const order = secp256k1.curve.n;
@@ -33,7 +34,7 @@ function deriveScalar(bytes, discrim) {
 * @return {bn.js} - 256 bit scalar value
 *
 */
-function derivePrivate(seed, opts={}) {
+function derivePrivate(seed, opts = {}) {
   const root = opts.validator;
   const order = secp256k1.curve.n;
 
@@ -81,7 +82,7 @@ extendClass(K256Pair, {
       return new K256Pair({privateBytes: parseBytes(privateKey)});
     },
 
-    function fromSeed(seedBytes, opts={}) {
+    function fromSeed(seedBytes, opts = {}) {
       return new K256Pair({seedBytes, validator: opts.validator});
     }
   ],
@@ -90,6 +91,13 @@ extendClass(K256Pair, {
     @param {Array<Byte>} message (bytes)
      */
     function sign(message) {
+      const speedup = this.speedup();
+      if (speedup) {
+        return toGenericArray(
+          speedup.sign(new Buffer(this.hashMessage(message)),
+                       this.privateBuffer(),
+                       true));
+      }
       return this._createSignature(message).toDER();
     },
 
@@ -99,10 +107,14 @@ extendClass(K256Pair, {
      */
     function verify(signature, message) {
       try {
+        const speedup = this.speedup();
+        if (speedup) {
+          return speedup.verify(new Buffer(this.hashMessage(message)),
+                                new Buffer(signature),
+                                this.publicBuffer());
+        }
         return this.key().verify(this.hashMessage(message), signature);
-        /* eslint-disable no-catch-shadow */
       } catch (e) {
-        /* eslint-enable no-catch-shadow */
         return false;
       }
     },
@@ -126,6 +138,25 @@ extendClass(K256Pair, {
     }
   ],
   cached: [
+    function speedup() {
+      if (!process || !(process.env.USE_SECP256K1_SPEEDUP === 'true')) {
+        return false;
+      }
+      try {
+        return require('secp256k1');
+      } catch(e) {
+        return false;
+      }
+    },
+
+    function privateBuffer() {
+      return new Buffer(this.privateBytes());
+    },
+
+    function publicBuffer() {
+      return new Buffer(this.publicBytes());
+    },
+
     function publicBytes() {
       return this.key().getPublic().encodeCompressed();
     },
