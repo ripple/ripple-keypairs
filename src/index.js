@@ -48,8 +48,8 @@ function deriveAccountKeys(seedBytes, type) {
   return keyPairFromSeed(seedBytes, type).toJSON();
 }
 
-function deriveValidatorKeys(seedBytes) {
-  return K256Pair.fromSeed(seedBytes, {validator: true}).toJSON();
+function deriveNodeKeys(seedBytes) {
+  return K256Pair.fromSeed(seedBytes, {node: true}).toJSON();
 }
 
 function generateAccountKeys(opts = {}) {
@@ -66,18 +66,18 @@ function accountKeysFromPhrase(phrase, seedType) {
   return deriveAccountKeys(seedFromPhrase(phrase), seedType);
 }
 
-function generateValidatorKeys(opts = {}) {
-  return deriveValidatorKeys(opts.entropy || brorand(16));
+function generateNodeKeys(opts = {}) {
+  return deriveNodeKeys(opts.entropy || brorand(16));
 }
 
-function validatorKeysFromSeed(seed, seedType) {
+function nodeKeysFromSeed(seed, seedType) {
   const {type, bytes} = parseSeed(seed, seedType);
   assert(type === KeyType.secp256k1);
-  return deriveValidatorKeys(bytes);
+  return deriveNodeKeys(bytes);
 }
 
-function validatorKeysFromPhrase(phrase) {
-  return deriveValidatorKeys(seedFromPhrase(phrase));
+function nodeKeysFromPhrase(phrase) {
+  return deriveNodeKeys(seedFromPhrase(phrase));
 }
 
 function sign(message, privateKey) {
@@ -102,7 +102,7 @@ module.exports = {
   nodePublicAccountID,
   deriveAccountIDBytes,
   accountKeysFromPhrase,
-  generateValidatorKeys,
-  validatorKeysFromSeed,
-  validatorKeysFromPhrase
+  generateNodeKeys,
+  nodeKeysFromSeed,
+  nodeKeysFromPhrase
 };

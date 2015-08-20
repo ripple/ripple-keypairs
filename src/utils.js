@@ -79,7 +79,7 @@ function parseSeed(seed, type = 'secp256k1') {
 }
 
 function parseKey(key) {
-  // parsePublicKey will parse any validator base58 if the key is a string and
+  // parsePublicKey will parse any node base58 if the key is a string and
   // the key starts with "n"
   const bytes = parsePublicKey(key);
   return {type: bytes.length === 33 &&

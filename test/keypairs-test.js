@@ -19,9 +19,9 @@ const {
   generateAccountKeys,
   accountKeysFromSeed,
   accountKeysFromPhrase,
-  generateValidatorKeys,
-  validatorKeysFromSeed,
-  validatorKeysFromPhrase,
+  generateNodeKeys,
+  nodeKeysFromSeed,
+  nodeKeysFromPhrase,
   nodePublicAccountID
 } = keypairs;
 
@@ -165,15 +165,15 @@ describe('accountKeysFromPhrase', function() {
   });
 });
 
-describe('validatorKeysFromPhrase', function() {
-  it('generates keys used by peer nodes/validators', function() {
+describe('nodeKeysFromPhrase', function() {
+  it('generates keys used by node nodes/nodes', function() {
     const expected = {
       seed: 'shQUG1pmPYrcnSUGeuJFJTA1b3JSL',
       publicKey: 'n9KNees3ippJvi7ZT1GqHMCmEmmkCVPxQRPfU5tPzmg9MtWevpjP',
       privateKey:
         '90959EDC6D5C97941CA33F37E60C1AE9CD5098137D7029443E56377D9E37CE3C'
     };
-    const wallet = validatorKeysFromPhrase('niq');
+    const wallet = nodeKeysFromPhrase('niq');
     assert.deepEqual(wallet, expected);
   });
 });
@@ -211,9 +211,9 @@ describe('generateAccountKeys', function() {
   });
 });
 
-describe('generateValidatorKeys', function() {
+describe('generateNodeKeys', function() {
   const entropy = _.fill(Array(16), 0);
-  it('can generate secp256k1 validator keys', function() {
+  it('can generate secp256k1 node keys', function() {
     /*
     rippled validation_create 00000000000000000000000000000000
     {
@@ -232,16 +232,16 @@ describe('generateValidatorKeys', function() {
       privateKey:
         'D296B892B3A7964BD0CC882FC7C0BE948B6BBD8EB1EFF8C13942FCAABF1F3877'
     };
-    const actual = generateValidatorKeys({entropy});
+    const actual = generateNodeKeys({entropy});
     assert.deepEqual(actual, expected);
-    assert.deepEqual(validatorKeysFromSeed(actual.seed), expected);
+    assert.deepEqual(nodeKeysFromSeed(actual.seed), expected);
   });
 
-  it('can generate the correct accountID from validator public key', () => {
+  it('can generate the correct accountID from node public key', () => {
     const accountID = 'rhcfR9Cg98qCxHpCcPBmMonbDBXo84wyTn';
-    const validatorPublic =
+    const nodePublic =
           'n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH';
-    assert.equal(nodePublicAccountID(validatorPublic), accountID);
+    assert.equal(nodePublicAccountID(nodePublic), accountID);
   });
 });
 

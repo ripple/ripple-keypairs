@@ -22,23 +22,23 @@ eddsa deterministic signatures.
   id: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ' }
 ```
 
-## Generate random validator keys
+## Generate random node keys
 ```js
-> require('ripple-keypairs').generateValidatorKeys();
+> require('ripple-keypairs').generateNodeKeys();
 { seed: 'ssC7Y9LMKhuzFMVueaj2fnTuGLftA',
   privateKey: 'BE011EF4B7A38D42C09DD299EFD0048DC9986F44076778F19AAC25E321D46247',
   publicKey: 'n9MU2RsULUayZnWeLssjbMzVRPeVUUMgiPYTwe8eMgpdGDWp5t8C' }
 ```
 
-## Derive validator keys from a seed
+## Derive node keys from a seed
 ```js
-> require('ripple-keypairs').validatorKeysFromSeed('ssC7Y9LMKhuzFMVueaj2fnTuGLftA');
+> require('ripple-keypairs').nodeKeysFromSeed('ssC7Y9LMKhuzFMVueaj2fnTuGLftA');
 { seed: 'ssC7Y9LMKhuzFMVueaj2fnTuGLftA',
   privateKey: 'BE011EF4B7A38D42C09DD299EFD0048DC9986F44076778F19AAC25E321D46247',
   publicKey: 'n9MU2RsULUayZnWeLssjbMzVRPeVUUMgiPYTwe8eMgpdGDWp5t8C' }
 ```
 
-## Derive accountID matching a validator public key (aka public generator)
+## Derive accountID matching a node public key (aka public generator)
 ```js
 > var nodePublicAccountID = require('ripple-keypairs').nodePublicAccountID;
 > nodePublicAccountID('n9MXXueo837zYH36DvMc13BwHcqtfAWNJY5czWVbp7uYTj7x17TH')

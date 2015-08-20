@@ -12,10 +12,11 @@ const KeyType = {
   ed25519: 'ed25519'
 };
 
-function KeyPair({seedBytes, publicBytes, privateBytes}) {
+function KeyPair({seedBytes, publicBytes, privateBytes, node}) {
   this._seedBytes = seedBytes;
   this._publicBytes = publicBytes;
   this._privateBytes = privateBytes;
+  this.is_node_key = node;
 }
 
 extendClass(KeyPair, {
@@ -78,7 +79,7 @@ extendClass(KeyPair, {
 
     function toJSON() {
       const json = {
-        publicKey: this.validator ?
+        publicKey: this.is_node_key ?
                 codec.encodeNodePublic(this.publicBytes()) :
                 this.publicHex()
       };
@@ -92,7 +93,7 @@ extendClass(KeyPair, {
       if (hasPrivate) {
         json.privateKey = this.privateHex();
       }
-      if (!this.validator) {
+      if (!this.is_node_key) {
         json.id = this.id();
       }
       return json;

@@ -29,17 +29,17 @@ function deriveScalar(bytes, discrim) {
 * @param {Array} seed - bytes
 * @param {Object} [opts] - object
 * @param {Number} [opts.accountIndex=0] - the account number to generate
-* @param {Boolean} [opts.validator=false] - generate root key-pair,
-*                                              as used by validators.
+* @param {Boolean} [opts.node=false] - generate root key-pair,
+*                                              as used by nodes.
 * @return {bn.js} - 256 bit scalar value
 *
 */
 function derivePrivate(seed, opts = {}) {
-  const root = opts.validator;
+  const root = opts.node;
   const order = secp256k1.curve.n;
 
   // This private generator represents the `root` private key, and is what's
-  // used by validators for signing when a keypair is generated from a seed.
+  // used by nodes for signing when a keypair is generated from a seed.
   const privateGen = deriveScalar(seed);
   if (root) {
     // As returned by validation_create for a given seed
@@ -64,7 +64,6 @@ function accountPublicFromPublicGenerator(publicGenBytes) {
 function K256Pair(options) {
   KeyPair.call(this, options);
   this.type = KeyType.secp256k1;
-  this.validator = options.validator;
 }
 
 extendClass(K256Pair, {
@@ -83,7 +82,7 @@ extendClass(K256Pair, {
     },
 
     function fromSeed(seedBytes, opts = {}) {
-      return new K256Pair({seedBytes, validator: opts.validator});
+      return new K256Pair({seedBytes, node: opts.node});
     }
   ],
   methods: [
@@ -126,7 +125,7 @@ extendClass(K256Pair, {
     function _private() {
       // elliptic will happily parse bytes or a bn.js object
       return this._privateBytes ||
-             derivePrivate(this._seedBytes, {validator: this.validator});
+             derivePrivate(this._seedBytes, {node: this.is_node_key});
     },
 
     /*
