@@ -6,6 +6,23 @@ const {KeyPair, KeyType} = require('./keypair');
 const utils = require('./utils');
 const {Sha512, extendClass, toGenericArray, parseBytes, parsePublicKey} = utils;
 
+function speedupModule() {
+  const fn = speedupModule;
+  if (!fn.cached) {
+    fn.cached = (function() {
+      if (!process || !(process.env.USE_SECP256K1_SPEEDUP === 'true')) {
+        return false;
+      }
+      try {
+        return require(String.fromCharCode(115) + 'ecp256k1');
+      } catch(e) {
+        return false;
+      }
+    }());
+  }
+  return fn.cached;
+}
+
 function deriveScalar(bytes, discrim) {
   const order = secp256k1.curve.n;
   for (let i = 0; i <= 0xFFFFFFFF; i++) {
@@ -90,7 +107,7 @@ extendClass(K256Pair, {
     @param {Array<Byte>} message (bytes)
      */
     function sign(message) {
-      const speedup = this.speedup();
+      const speedup = speedupModule();
       if (speedup) {
         return toGenericArray(
           speedup.sign(new Buffer(this.hashMessage(message)),
@@ -106,7 +123,7 @@ extendClass(K256Pair, {
      */
     function verify(signature, message) {
       try {
-        const speedup = this.speedup();
+        const speedup = speedupModule();
         if (speedup) {
           return speedup.verify(new Buffer(this.hashMessage(message)),
                                 new Buffer(signature),
@@ -137,17 +154,6 @@ extendClass(K256Pair, {
     }
   ],
   cached: [
-    function speedup() {
-      if (!process || !(process.env.USE_SECP256K1_SPEEDUP === 'true')) {
-        return false;
-      }
-      try {
-        return require('secp256k1');
-      } catch(e) {
-        return false;
-      }
-    },
-
     function privateBuffer() {
       return new Buffer(this.privateBytes());
     },
@@ -175,5 +181,6 @@ extendClass(K256Pair, {
 
 module.exports = {
   K256Pair,
-  accountPublicFromPublicGenerator
+  accountPublicFromPublicGenerator,
+  speedupModule
 };

@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const utils = require('../src/utils');
 const keypairs = require('../src');
-const {K256Pair} = require('../src/secp256k1');
+const {K256Pair, speedupModule} = require('../src/secp256k1');
 const {KeyType} = require('../src/keypair');
 const {Ed25519Pair} = require('../src/ed25519');
 
@@ -248,6 +248,7 @@ describe('generateNodeKeys', function() {
 function withSpeedUp(useSpeedUp, func) {
   return function() {
     process.env.USE_SECP256K1_SPEEDUP = useSpeedUp ? 'true' : '';
+    speedupModule();
 
     let erred = false;
     try {
@@ -256,6 +257,7 @@ function withSpeedUp(useSpeedUp, func) {
       erred = e;
     }
     process.env.USE_SECP256K1_SPEEDUP = '';
+    delete speedupModule.cached;
     if (erred) {
       throw erred;
     }
@@ -272,8 +274,7 @@ describe('secp256k1', function() {
       useSpeedUp,
       function() {
         key = K256Pair.fromSeed(seedFromPhrase('niq'));
-        key.speedup(); // Important: so it's ready to go!
-        assert.equal(Boolean(key.speedup()), useSpeedUp);
+        assert.equal(Boolean(speedupModule()), useSpeedUp);
       })
     );
 
