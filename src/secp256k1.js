@@ -123,5 +123,6 @@ class K256Pair extends KeyPair {
 
 module.exports = {
   K256Pair,
+  deriveSecret,
   accountPublicFromPublicGenerator
 };

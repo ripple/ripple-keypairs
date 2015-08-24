@@ -1,6 +1,7 @@
 'use strict';
 
 const hashjs = require('hash.js');
+const BN = require('bn.js');
 const Sha512 = require('./sha512');
 
 function unused() {}
@@ -42,7 +43,11 @@ function bytesToHex(a) {
   }).join('');
 }
 
-function createAccountID(pubKeyBytes) {
+function hexToBytes(a) {
+  return (new BN(a, 16)).toArray();
+}
+
+function deriveAccountIDBytes(pubKeyBytes) {
   const hash256 = hashjs.sha256().update(pubKeyBytes).digest();
   const hash160 = hashjs.ripemd160().update(hash256).digest();
   return hash160;
@@ -55,7 +60,8 @@ function seedFromPhrase(phrase) {
 module.exports = {
   cached,
   bytesToHex,
-  createAccountID,
+  hexToBytes,
+  deriveAccountIDBytes,
   isVirtual,
   seedFromPhrase,
   Sha512,
