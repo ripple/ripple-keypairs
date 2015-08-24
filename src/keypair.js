@@ -5,7 +5,7 @@ const {
   bytesToHex,
   cached,
   isVirtual,
-  createAccountID
+  deriveAccountIDBytes
 } = require('./utils');
 
 const KeyType = {
@@ -45,7 +45,7 @@ class KeyPair {
 
   @cached
   accountBytes() {
-    return createAccountID(this.pubKeyCanonicalBytes());
+    return deriveAccountIDBytes(this.pubKeyCanonicalBytes());
   }
 
   @cached
