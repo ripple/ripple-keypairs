@@ -44,10 +44,7 @@ function derivePrivateKey(seed, opts = {}) {
     return privateGen;
   }
   const publicGen = secp256k1.g.mul(privateGen);
-  // A seed can generate many keypairs as a function of the seed and a uint32.
-  // Almost everyone just uses the first account, `0`.
-  const accountIndex = opts.accountIndex || 0;
-  return deriveScalar(publicGen.encodeCompressed(), accountIndex)
+  return deriveScalar(publicGen.encodeCompressed(), 0)
             .add(privateGen).mod(order);
 }
 
