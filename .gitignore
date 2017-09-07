@@ -60,6 +60,4 @@ out/
 # Ignore perf test cache
 scripts/cache
 
-eslintrc
-
 distrib/
