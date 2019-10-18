@@ -1,1 +1,3 @@
---reporter spec --timeout 5000 --slow 500 --compilers js:babel/register
+--require source-map-support/register
+--full-trace
+test/*.js
