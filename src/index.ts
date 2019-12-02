@@ -118,7 +118,7 @@ function deriveNodeAddress(publicKey) {
 
 const decodeSeed = addressCodec.decodeSeed
 
-module.exports = {
+export default {
   generateSeed,
   deriveKeypair,
   sign,
