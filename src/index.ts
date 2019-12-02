@@ -13,7 +13,7 @@ const Secp256k1 = elliptic.ec('secp256k1')
 const hexToBytes = utils.hexToBytes
 const bytesToHex = utils.bytesToHex
 
-function generateSeed(options: {
+export function generateSeed(options: {
   entropy?: Uint8Array,
   algorithm?: 'ed25519' | 'secp256k1'
 } = {}) {
@@ -72,7 +72,7 @@ function select(algorithm) {
   return methods[algorithm]
 }
 
-function deriveKeypair(seed, options) {
+export function deriveKeypair(seed, options) {
   const decoded = addressCodec.decodeSeed(seed)
   const algorithm = decoded.type === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
   const method = select(algorithm)
@@ -91,12 +91,12 @@ function getAlgorithmFromKey(key) {
     'ed25519' : 'ecdsa-secp256k1'
 }
 
-function sign(messageHex, privateKey) {
+export function sign(messageHex, privateKey) {
   const algorithm = getAlgorithmFromKey(privateKey)
   return select(algorithm).sign(hexToBytes(messageHex), privateKey)
 }
 
-function verify(messageHex, signature, publicKey) {
+export function verify(messageHex, signature, publicKey) {
   const algorithm = getAlgorithmFromKey(publicKey)
   return select(algorithm).verify(hexToBytes(messageHex), signature, publicKey)
 }
@@ -106,24 +106,14 @@ function deriveAddressFromBytes(publicKeyBytes: Buffer) {
     utils.computePublicKeyHash(publicKeyBytes))
 }
 
-function deriveAddress(publicKey) {
+export function deriveAddress(publicKey) {
   return deriveAddressFromBytes(hexToBytes(publicKey))
 }
 
-function deriveNodeAddress(publicKey) {
+export function deriveNodeAddress(publicKey) {
   const generatorBytes = addressCodec.decodeNodePublic(publicKey)
   const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes)
   return deriveAddressFromBytes(accountPublicBytes)
 }
 
-const decodeSeed = addressCodec.decodeSeed
-
-export default {
-  generateSeed,
-  deriveKeypair,
-  sign,
-  verify,
-  deriveAddress,
-  deriveNodeAddress,
-  decodeSeed
-}
+export const decodeSeed = addressCodec.decodeSeed
