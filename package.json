@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@types/node": "^13.1.5",
-    "assert-diff": "^1.0.1",
+    "assert-diff": "^2.0.3",
     "babel": "^5.8.20",
     "babel-core": "^5.8.20",
     "babel-eslint": "^6.0.0",
