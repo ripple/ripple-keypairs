@@ -28,7 +28,7 @@
     "codecov.io": "^0.1.6",
     "coveralls": "~2.11.4",
     "eslint": "6.8.0",
-    "eventemitter2": "^0.4.14",
+    "eventemitter2": "^6.0.0",
     "istanbul": "~0.3.5",
     "map-stream": "~0.1.0",
     "mocha": "~2.3.3",
