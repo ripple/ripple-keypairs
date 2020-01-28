@@ -12,7 +12,7 @@
   "dependencies": {
     "bn.js": "^5.1.1",
     "brorand": "^1.0.5",
-    "elliptic": "^6.4.0",
+    "elliptic": "^6.5.2",
     "hash.js": "^1.0.3",
     "source-map-support": "^0.5.13",
     "ripple-address-codec": "^4.0.0"
@@ -43,5 +43,8 @@
     "type": "git",
     "url": "git://github.com/ripple/ripple-keypairs.git"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">= 8"
+  }
 }
