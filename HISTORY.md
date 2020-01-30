@@ -1,9 +1,12 @@
 # ripple-keypairs Release History
 
-## 1.0.0-beta.5 (2020-01-29)
+## 1.0.0-beta.6 (2020-01-29)
 
-* Add some types
-* Export members
+* 1.0.0-beta.6
+  * Add default export
+* 1.0.0-beta.5
+  * Add some types
+  * Export members
 
 ## 1.0.0-beta.2 (2020-01-28)
 

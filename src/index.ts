@@ -164,7 +164,7 @@ function deriveNodeAddress(publicKey): string {
 
 const { decodeSeed } = addressCodec
 
-export {
+export = {
   generateSeed,
   deriveKeypair,
   sign,
