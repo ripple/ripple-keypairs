@@ -1,6 +1,6 @@
 {
   "name": "ripple-keypairs",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.5",
   "description": "Cryptographic key pairs for the XRP Ledger",
   "files": [
     "dist/*"
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
-    "@types/node": "^13.1.5",
+    "@types/node": "^13.5.2",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
     "eslint": "^6.8.0",
@@ -37,7 +37,8 @@
   "scripts": {
     "compile": "tsc",
     "test": "tsc && nyc mocha",
-    "lint": "eslint . --ext .ts --fix"
+    "lint": "eslint . --ext .ts --fix",
+    "prepublish": "tsc && nyc mocha && eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
