@@ -1,6 +1,11 @@
 # ripple-keypairs Release History
 
-## 1.0.0-beta.1 (2020-01-28)
+## 1.0.0-beta.3 (2020-01-29)
+
+* Add some types
+* Export members
+
+## 1.0.0-beta.2 (2020-01-28)
 
 * Internal
   * Travis: remove node 6 and add node 13 (#59)
@@ -13,6 +18,7 @@
   * Remove Babel (#33)
 * Update dependencies
   * @types/node, eslint, bn.js, typescript, @typescript-eslint/eslint-plugin, @typescript-eslint/parser, mocha, istanbul, hash.js
+* Identical to `1.0.0-beta.1`
 
 ## 1.0.0-beta.0 (2019-10-17)
 
