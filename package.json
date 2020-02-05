@@ -39,7 +39,7 @@
     "compile": "tsc",
     "test": "tsc && nyc mocha",
     "lint": "eslint . --ext .ts --fix",
-    "prepublish": "tsc && nyc mocha && eslint . --ext .ts"
+    "prepublish": "yarn lint && yarn test"
   },
   "repository": {
     "type": "git",
