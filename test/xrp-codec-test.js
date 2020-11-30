@@ -2,7 +2,8 @@
 
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert/')
+const { Buffer } = require('buffer/')
 const api = require('ripple-address-codec')
 
 function toHex(bytes) {

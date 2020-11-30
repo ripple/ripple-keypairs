@@ -1,6 +1,6 @@
 'use strict' // eslint-disable-line strict
 
-const assert = require('assert')
+const assert = require('assert/')
 const utils = require('../dist/utils')
 
 describe('utils', () => {

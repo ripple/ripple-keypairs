@@ -1,5 +1,6 @@
-import * as assert from 'assert'
+import * as assert from 'assert/'
 import * as brorand from 'brorand'
+import { Buffer } from 'buffer/'
 import * as hashjs from 'hash.js'
 import * as elliptic from 'elliptic'
 
@@ -26,11 +27,7 @@ function generateSeed(
 }
 
 function hash(message): number[] {
-  return hashjs
-    .sha512()
-    .update(message)
-    .digest()
-    .slice(0, 32)
+  return hashjs.sha512().update(message).digest().slice(0, 32)
 }
 
 const secp256k1 = {
@@ -44,10 +41,7 @@ const secp256k1 = {
     const prefix = '00'
 
     const privateKey =
-      prefix +
-      derivePrivateKey(entropy, options)
-        .toString(16, 64)
-        .toUpperCase()
+      prefix + derivePrivateKey(entropy, options).toString(16, 64).toUpperCase()
 
     const publicKey = bytesToHex(
       Secp256k1.keyFromPrivate(privateKey.slice(2))
@@ -148,7 +142,7 @@ function verify(messageHex, signature, publicKey): boolean {
 
 function deriveAddressFromBytes(publicKeyBytes: Buffer): string {
   return addressCodec.encodeAccountID(
-    utils.computePublicKeyHash(publicKeyBytes),
+    utils.computePublicKeyHash(publicKeyBytes) as any,
   )
 }
 

@@ -1,4 +1,5 @@
-import * as assert from 'assert'
+import * as assert from 'assert/'
+import { Buffer } from 'buffer/'
 import * as hashjs from 'hash.js'
 import * as BN from 'bn.js'
 
@@ -17,15 +18,9 @@ function hexToBytes(a): number[] {
 }
 
 function computePublicKeyHash(publicKeyBytes: Buffer): Buffer {
-  const hash256 = hashjs
-    .sha256()
-    .update(publicKeyBytes)
-    .digest()
+  const hash256 = hashjs.sha256().update(publicKeyBytes).digest()
 
-  const hash160 = hashjs
-    .ripemd160()
-    .update(hash256)
-    .digest()
+  const hash160 = hashjs.ripemd160().update(hash256).digest()
   return Buffer.from(hash160)
 }
 

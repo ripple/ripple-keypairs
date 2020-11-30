@@ -1,6 +1,7 @@
 'use strict' // eslint-disable-line strict
 
-const assert = require('assert')
+const assert = require('assert/')
+const { Buffer } = require('buffer/')
 const fixtures = require('./fixtures/api.json')
 const api = require('../dist')
 const decodeSeed = api.decodeSeed
